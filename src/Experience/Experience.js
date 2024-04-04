@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 import Sizes from './Utils/Sizes.js'
 import Time from './Utils/Time.js'
@@ -8,6 +9,8 @@ import World from './World/World.js'
 import Resources from './Utils/Resources.js'
 import sources from './sources.js'
 import Debug from './Utils/Debug.js'
+import Physics from './Utils/Physics.js'
+import InputController from './Utils/InputController.js';
 
 let instance = null
 
@@ -36,8 +39,16 @@ export default class Experience
         this.resources = new Resources(sources)
         this.camera = new Camera()
         this.renderer = new Renderer()
-
+        
         this.world = new World()
+        this.inputController = new InputController({ 
+            camera: this.camera, 
+            domElement: document.body 
+        })
+        
+        this.initRapier()
+        this.stats = new Stats()
+        document.body.appendChild(this.stats.dom)
 
         // Resize event
         this.sizes.on('resize', () =>
@@ -50,19 +61,36 @@ export default class Experience
         {
             this.update()
         })
+       
+    }
+
+    initRapier() 
+    {
+        import('@dimforge/rapier3d').then(RAPIER => {
+            this.RAPIER = RAPIER
+            
+            let gravity = { x: 0.0, y: -9.81, z: 0.0 };
+            let world = new RAPIER.World(gravity);
+            this.physics = new Physics(this.scene, world)
+            
+            this.world.addItems()
+        })
+ 
     }
 
     resize()
-    {
+    {   
         this.camera.resize()
         this.renderer.resize()
     }
 
     update()
     {
+        this.stats.begin()
         this.camera.update()
-        // this.world.update()
         this.renderer.update()
+        this.stats.end()
+
     }
 
     destroy()
