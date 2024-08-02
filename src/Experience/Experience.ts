@@ -55,6 +55,16 @@ export default class Experience {
         mesh.position.z = -8;
 
         this.scene.add(mesh)
+
+        let test = {
+            check : false
+        }
+
+        let meshFolder = this.debug.ui.addFolder('Icosahedron')
+
+        meshFolder.add(mesh.position, 'x', -3, 3, 0.1)
+        meshFolder.add(mesh.position, 'y', -3, 3, 0.1)
+        meshFolder.add(mesh.position, 'z', -10, -3, 0.1)
     }
 
     onResize() {
